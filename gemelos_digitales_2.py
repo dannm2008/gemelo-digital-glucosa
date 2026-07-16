@@ -10,14 +10,20 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 import time
 import os
-import kagglehub
+
+# Intentar importar kagglehub, si falla, usamos datos sintéticos
+try:
+    import kagglehub
+    KAGGLE_DISPONIBLE = True
+except ImportError:
+    KAGGLE_DISPONIBLE = False
+    print("⚠️ Kagglehub no disponible. Usando datos sintéticos.")
 
 # ==============================================================================
 # CONFIGURACIÓN DE LA PÁGINA (Debe ser la primera instrucción)
@@ -30,7 +36,7 @@ st.set_page_config(
 )
 
 # ==============================================================================
-# ESTILOS CSS AVANZADOS (Clínico, Elegante y Premium) - TU VERSIÓN MEJORADA
+# ESTILOS CSS AVANZADOS (Clínico, Elegante y Premium)
 # ==============================================================================
 st.markdown("""
     <style>
@@ -166,77 +172,75 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # ==============================================================================
-# FUNCIONES DE CARGA Y ENTRENAMIENTO DE MODELOS (REALES - DEL PROYECTO)
+# FUNCIONES DE CARGA Y ENTRENAMIENTO DE MODELOS
 # ==============================================================================
 
 @st.cache_resource
 def cargar_y_entrenar_modelos():
     """
     Carga los datos del Paciente 005 del dataset D1NAMO y entrena los modelos.
-    La función está cacheada para que solo se ejecute una vez.
+    Si falla, usa datos sintéticos.
     """
     with st.spinner("🔄 Cargando datos y entrenando modelos de IA... Esto puede tomar unos segundos."):
         try:
-            # Intentar descargar el dataset de D1NAMO
-            ruta_cache = kagglehub.dataset_download("sarabhian/d1namo-ecg-glucose-data")
-            
-            def cargar_csv_paciente(id_paciente):
-                ruta_csv = os.path.join(ruta_cache, 'healthy_subset_pictures-glucose-food', 
-                                       'healthy_subset_pictures-glucose-food', id_paciente, 'glucose.csv')
-                if os.path.exists(ruta_csv):
-                    df_p = pd.read_csv(ruta_csv)
-                    df_p['glucose_mgdl'] = df_p['glucose'] * 18.016
-                    df_p['minutos_dia'] = pd.to_datetime(df_p['time'], format='%H:%M').dt.hour * 60 + pd.to_datetime(df_p['time'], format='%H:%M').dt.minute
+            if KAGGLE_DISPONIBLE:
+                # Intentar descargar el dataset de D1NAMO
+                ruta_cache = kagglehub.dataset_download("sarabhian/d1namo-ecg-glucose-data")
+                
+                def cargar_csv_paciente(id_paciente):
+                    ruta_csv = os.path.join(ruta_cache, 'healthy_subset_pictures-glucose-food', 
+                                           'healthy_subset_pictures-glucose-food', id_paciente, 'glucose.csv')
+                    if os.path.exists(ruta_csv):
+                        df_p = pd.read_csv(ruta_csv)
+                        df_p['glucose_mgdl'] = df_p['glucose'] * 18.016
+                        df_p['minutos_dia'] = pd.to_datetime(df_p['time'], format='%H:%M').dt.hour * 60 + pd.to_datetime(df_p['time'], format='%H:%M').dt.minute
+                        
+                        # One-Hot Encoding para el tipo de comida
+                        for comida in ['AB', 'AD', 'AL', 'BB', 'BD', 'BL', 'M']:
+                            df_p[f'type_{comida}'] = (df_p['type'] == comida).astype(int)
+                        
+                        columnas_X = ['minutos_dia'] + [f'type_{c}' for c in ['AB', 'AD', 'AL', 'BB', 'BD', 'BL', 'M']]
+                        return df_p[columnas_X], df_p['glucose_mgdl']
+                    return None
+                
+                # Cargar datos del paciente 005
+                X_005, y_005 = cargar_csv_paciente('005')
+                
+                if X_005 is not None:
+                    # Dividir en entrenamiento y prueba
+                    X_train, X_test, y_train, y_test = train_test_split(X_005, y_005, test_size=0.2, random_state=42)
                     
-                    # One-Hot Encoding para el tipo de comida
-                    for comida in ['AB', 'AD', 'AL', 'BB', 'BD', 'BL', 'M']:
-                        df_p[f'type_{comida}'] = (df_p['type'] == comida).astype(int)
+                    # Entrenar Random Forest
+                    modelo_rf = RandomForestRegressor(n_estimators=50, random_state=42)
+                    modelo_rf.fit(X_train, y_train)
+                    pred_rf = modelo_rf.predict(X_test)
+                    mae_rf = mean_absolute_error(y_test, pred_rf)
                     
-                    columnas_X = ['minutos_dia'] + [f'type_{c}' for c in ['AB', 'AD', 'AL', 'BB', 'BD', 'BL', 'M']]
-                    return df_p[columnas_X], df_p['glucose_mgdl']
-                return None
+                    # Entrenar Árbol de Decisión
+                    modelo_dt = DecisionTreeRegressor(max_depth=3, random_state=42)
+                    modelo_dt.fit(X_train, y_train)
+                    pred_dt = modelo_dt.predict(X_test)
+                    mae_dt = mean_absolute_error(y_test, pred_dt)
+                    
+                    return {
+                        'modelo_rf': modelo_rf,
+                        'modelo_dt': modelo_dt,
+                        'X_train': X_train,
+                        'X_test': X_test,
+                        'y_train': y_train,
+                        'y_test': y_test,
+                        'pred_rf': pred_rf,
+                        'pred_dt': pred_dt,
+                        'mae_rf': mae_rf,
+                        'mae_dt': mae_dt,
+                        'columnas_X': X_005.columns.tolist()
+                    }
             
-            # Cargar datos del paciente 005
-            X_005, y_005 = cargar_csv_paciente('005')
-            
-            if X_005 is None:
-                raise Exception("No se pudieron cargar los datos del paciente 005")
-            
-            # Dividir en entrenamiento y prueba
-            X_train, X_test, y_train, y_test = train_test_split(X_005, y_005, test_size=0.2, random_state=42)
-            
-            # Entrenar Random Forest (el mejor modelo según los resultados)
-            modelo_rf = RandomForestRegressor(n_estimators=50, random_state=42)
-            modelo_rf.fit(X_train, y_train)
-            pred_rf = modelo_rf.predict(X_test)
-            mae_rf = mean_absolute_error(y_test, pred_rf)
-            
-            # Entrenar Árbol de Decisión para la explicabilidad
-            modelo_dt = DecisionTreeRegressor(max_depth=3, random_state=42)
-            modelo_dt.fit(X_train, y_train)
-            pred_dt = modelo_dt.predict(X_test)
-            mae_dt = mean_absolute_error(y_test, pred_dt)
-            
-            # Guardar resultados
-            resultados = {
-                'modelo_rf': modelo_rf,
-                'modelo_dt': modelo_dt,
-                'X_train': X_train,
-                'X_test': X_test,
-                'y_train': y_train,
-                'y_test': y_test,
-                'pred_rf': pred_rf,
-                'pred_dt': pred_dt,
-                'mae_rf': mae_rf,
-                'mae_dt': mae_dt,
-                'columnas_X': X_005.columns.tolist()
-            }
-            
-            return resultados
+            # Si llegamos aquí, usar datos sintéticos
+            return entrenar_modelos_sinteticos()
             
         except Exception as e:
-            # Fallback: Si no se puede descargar, usar datos sintéticos
-            st.warning(f"⚠️ No se pudo cargar el dataset D1NAMO. Usando datos sintéticos para demostración. Error: {str(e)}")
+            st.warning(f"⚠️ No se pudo cargar el dataset D1NAMO. Usando datos sintéticos para demostración.")
             return entrenar_modelos_sinteticos()
 
 def entrenar_modelos_sinteticos():
@@ -247,9 +251,10 @@ def entrenar_modelos_sinteticos():
     n_samples = 1000
     minutos_dia = np.random.randint(0, 1440, n_samples)
     
-    # Patrón de glucosa simulado
+    # Patrón de glucosa simulado (más realista)
     glucosa_base = 100 + 15 * np.sin(minutos_dia / 1440 * 2 * np.pi * 2)
     glucosa = glucosa_base + np.random.normal(0, 10, n_samples)
+    glucosa = np.clip(glucosa, 60, 180)  # Mantener en rangos razonables
     
     # Crear DataFrame
     df = pd.DataFrame({
@@ -257,7 +262,7 @@ def entrenar_modelos_sinteticos():
         'glucose_mgdl': glucosa
     })
     
-    # Añadir columnas de tipo de comida (simuladas)
+    # Añadir columnas de tipo de comida
     for comida in ['AB', 'AD', 'AL', 'BB', 'BD', 'BL', 'M']:
         df[f'type_{comida}'] = np.random.choice([0, 1], n_samples, p=[0.85, 0.15])
     
@@ -402,7 +407,7 @@ def predecir_glucosa(modelo, hora, comida, columnas_X):
 # INICIALIZACIÓN DE MODELOS Y ESTADOS DE SESIÓN
 # ==============================================================================
 
-# Cargar los modelos (se ejecuta una sola vez)
+# Cargar los modelos
 resultados = cargar_y_entrenar_modelos()
 
 # Estados de sesión
@@ -451,7 +456,7 @@ with st.sidebar:
     st.caption("© Programa Delfín 2026")
 
 # ==============================================================================
-# PÁGINA 1: ADMISIÓN DEL PACIENTE (VERSIÓN COMPLETA)
+# PÁGINA 1: ADMISIÓN DEL PACIENTE
 # ==============================================================================
 if st.session_state.pagina_actual == "Admisión":
     st.caption("METABOLICTWIN > PATIENT ADMISSION")
@@ -524,7 +529,7 @@ if st.session_state.pagina_actual == "Admisión":
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
-# PÁGINA 2: MONITOR EN TIEMPO REAL (GEMELO DIGITAL)
+# PÁGINA 2: MONITOR EN TIEMPO REAL
 # ==============================================================================
 elif st.session_state.pagina_actual == "Gemelo":
     paciente = st.session_state.paciente_datos
