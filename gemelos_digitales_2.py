@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
-import kagglehub
 import os
 
 # --- CONFIGURACIÓN DE PÁGINA ---
@@ -81,11 +80,11 @@ traduccion_comidas = {
     "BL": "Antes del Almuerzo"
 }
 
-# --- CARGA DEL MODELO EN SEGUNDO PLANO ---
+# --- CARGA DEL MODELO DESDE ARCHIVO LOCAL (OPTIMIZADA Y SIN KAGGLEHUB) ---
 @st.cache_resource
 def inicializar_modelo_y_datos():
-    path = kagglehub.dataset_download("paultimothymooney/d1namo-dataset")
-    glucose_path = os.path.join(path, "diabetes_subset", "diabetes_subset", "005", "glucose.csv")
+    # Se lee directamente el archivo subido al repositorio de GitHub
+    glucose_path = "glucose.csv"
     df = pd.read_csv(glucose_path)
     df['date'] = pd.to_datetime(df['date'] + ' ' + df['time'])
     df['hour'] = df['date'].dt.hour
@@ -113,7 +112,7 @@ with st.sidebar:
     st.markdown("### Nodo Clínico PAC-005")
     st.markdown("---")
     
-    # Navegación del Menú Estilo Imagen
+    # Navegación del Menú
     if st.button("Admisión de Pacientes", use_container_width=True):
         st.session_state.pagina_actual = "Admisión"
         st.rerun()
@@ -144,7 +143,7 @@ if st.session_state.pagina_actual == "Admisión":
     
     # Contenedor del formulario centrado
     with st.container():
-        st.markdown("<div class='clinical-card'>", unsafe_allow_stdio=True)
+        st.markdown("<div class='clinical-card'>", unsafe_allow_html=True)
         with st.form("form_clinico"):
             nombre = st.text_input("Nombre Completo del Paciente:", placeholder="Ej. Juan Pérez")
             
@@ -172,7 +171,7 @@ if st.session_state.pagina_actual == "Admisión":
                     st.success("¡Datos guardados! Cargando tablero metabólico...")
                     st.session_state.pagina_actual = "Gemelo"
                     st.rerun()
-        st.markdown("</div>", unsafe_allow_stdio=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # --- PÁGINA 2: DASHBOARD DEL GEMELO DIGITAL ---
 elif st.session_state.pagina_actual == "Gemelo":
@@ -186,7 +185,7 @@ elif st.session_state.pagina_actual == "Gemelo":
     col_izq, col_der = st.columns([2.2, 1])
     
     with col_izq:
-        st.markdown("<div class='clinical-card'>", unsafe_allow_stdio=True)
+        st.markdown("<div class='clinical-card'>", unsafe_allow_html=True)
         st.markdown("### Panel de Control y Simulación")
         
         c1, c2 = st.columns(2)
@@ -200,7 +199,7 @@ elif st.session_state.pagina_actual == "Gemelo":
             )
             
         simular = st.button("Ejecutar Simulación en Gemelo Digital", use_container_width=True)
-        st.markdown("</div>", unsafe_allow_stdio=True)
+        st.markdown("</div>", unsafe_allow_html=True)
         
         # Cálculos de predicción al simular
         h, m = hora_sim.hour, hora_sim.minute
@@ -212,7 +211,7 @@ elif st.session_state.pagina_actual == "Gemelo":
         glucosa_predicha = model.predict(input_data)[0]
         
         # Bloque de Gráfica de Tendencia
-        st.markdown("<div class='clinical-card'>", unsafe_allow_stdio=True)
+        st.markdown("<div class='clinical-card'>", unsafe_allow_html=True)
         st.markdown("### Trayectoria de Glucosa Predictiva (Siguientes Horas)")
         
         horas_futuras = [(h + i) % 24 for i in range(6)]
@@ -233,17 +232,17 @@ elif st.session_state.pagina_actual == "Gemelo":
         ax.legend(loc="upper left")
         ax.grid(True, linestyle=':', alpha=0.6)
         st.pyplot(fig)
-        st.markdown("</div>", unsafe_allow_stdio=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with col_der:
         # Panel de Lectura Actual
-        st.markdown("<div class='clinical-card'>", unsafe_allow_stdio=True)
+        st.markdown("<div class='clinical-card'>", unsafe_allow_html=True)
         st.markdown("#### Lectura Estimada de la IA")
-        st.markdown(f"<h1 style='font-size: 3rem; color: #00509d; margin:0;'>{glucosa_predicha:.1f} <span style='font-size: 1.2rem; color: #64748B;'>mg/dL</span></h1>", unsafe_allow_stdio=True)
-        st.markdown("</div>", unsafe_allow_stdio=True)
+        st.markdown(f"<h1 style='font-size: 3rem; color: #00509d; margin:0;'>{glucosa_predicha:.1f} <span style='font-size: 1.2rem; color: #64748B;'>mg/dL</span></h1>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
         
         # Panel de Evaluación de Riesgos Estilo Imagen
-        st.markdown("<div class='clinical-card'>", unsafe_allow_stdio=True)
+        st.markdown("<div class='clinical-card'>", unsafe_allow_html=True)
         st.markdown("### Evaluación de Riesgos")
         
         if glucosa_predicha < 70:
@@ -267,7 +266,7 @@ elif st.session_state.pagina_actual == "Gemelo":
                     El Gemelo Digital predice rangos metabólicos seguros y equilibrados.
                 </div>
             """, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_stdio=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # --- PÁGINA 3: ¿CÓMO FUNCIONA? (HELP / MANUAL) ---
 elif st.session_state.pagina_actual == "Ayuda":
