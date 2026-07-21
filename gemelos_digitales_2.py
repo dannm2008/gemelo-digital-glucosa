@@ -416,11 +416,11 @@ def mostrar_rejilla_clarke(resultados):
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("✅ Zona A (Segura)", "100%", help="Todas las predicciones clínicamente seguras")
+        st.metric(" Zona A (Segura)", "100%", help="Todas las predicciones clínicamente seguras")
     with col2:
-        st.metric("📊 Total Predicciones", f"{len(y_test)}", help="Número de evaluaciones")
+        st.metric(" Total Predicciones", f"{len(y_test)}", help="Número de evaluaciones")
     with col3:
-        st.metric("🎯 Precisión Clínica", "Excelente")
+        st.metric(" Precisión Clínica", "Excelente")
 
 def predecir_glucosa(modelo, hora, comida, columnas_X):
     """Realiza una predicción personalizada."""
@@ -451,35 +451,35 @@ if 'prediccion_actual' not in st.session_state:
 # ==============================================================================
 with st.sidebar:
     st.markdown("<div style='padding: 10px 0px;'>", unsafe_allow_html=True)
-    st.markdown("### 🧬 GEMELOS DIGITALES")
+    st.markdown("###  GEMELOS DIGITALES")
     st.caption("v2.4.0 | Sistema Personalizado")
     st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("---")
     
-    if st.button("📋 Admisión del Paciente", use_container_width=True):
+    if st.button(" Admisión del Paciente", use_container_width=True):
         st.session_state.pagina_actual = "Admisión"
         st.rerun()
         
-    if st.button("📊 Monitor en Tiempo Real", use_container_width=True):
+    if st.button(" Monitor en Tiempo Real", use_container_width=True):
         if st.session_state.paciente_datos is None:
-            st.warning("⚠️ Debe registrar un paciente en Admisión.")
+            st.warning(" Debe registrar un paciente en Admisión.")
         else:
             st.session_state.pagina_actual = "Gemelo"
             st.rerun()
     
-    if st.button("📈 Análisis Clínico", use_container_width=True):
+    if st.button(" Análisis Clínico", use_container_width=True):
         if st.session_state.paciente_datos is None:
-            st.warning("⚠️ Debe registrar un paciente en Admisión.")
+            st.warning(" Debe registrar un paciente en Admisión.")
         else:
             st.session_state.pagina_actual = "Analisis"
             st.rerun()
             
-    if st.button("ℹ️ Documentación", use_container_width=True):
+    if st.button(" Documentación", use_container_width=True):
         st.session_state.pagina_actual = "Ayuda"
         st.rerun()
     
     st.markdown("---")
-    st.caption("🧬 Programa Delfín 2026")
+    st.caption(" Programa Delfín 2026")
     st.caption("Laura D. Merchán Gil")
 
 # ==============================================================================
@@ -487,7 +487,7 @@ with st.sidebar:
 # ==============================================================================
 if st.session_state.pagina_actual == "Admisión":
     st.caption("GEMELOS DIGITALES > ADMISIÓN")
-    st.markdown("<h1 class='main-title'>📋 Admisión de Paciente</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-title'> Admisión de Paciente</h1>", unsafe_allow_html=True)
     st.markdown("<p class='main-subtitle'>Ingrese sus datos clínicos para generar un Gemelo Digital completamente personalizado.</p>", unsafe_allow_html=True)
     st.markdown("---")
     
@@ -496,48 +496,48 @@ if st.session_state.pagina_actual == "Admisión":
     with col_centro:
         st.markdown("<div class='clinical-container'>", unsafe_allow_html=True)
         st.markdown("### Ficha Médica de Ingreso")
-        st.info("ℹ️ Todos los campos marcados con * son obligatorios. El sistema generará un perfil metabólico único.")
+        st.info(" Todos los campos marcados con * son obligatorios. El sistema generará un perfil metabólico único.")
         
         with st.form("form_admision"):
             col1, col2 = st.columns(2)
             with col1:
-                nombre = st.text_input("👤 Nombre Completo *", placeholder="Ej. Juan Pérez")
-                edad = st.number_input("📅 Edad (Años) *", min_value=1, max_value=120, value=35, step=1)
+                nombre = st.text_input(" Nombre Completo *", placeholder="Ej. Juan Pérez")
+                edad = st.number_input(" Edad (Años) *", min_value=1, max_value=120, value=35, step=1)
                 genero = st.radio("⚥ Género *", ["Masculino", "Femenino", "Otra"], index=1)
             with col2:
-                id_hist = st.text_input("🏥 ID de Historial", value="PAC-001", disabled=True)
-                peso = st.number_input("⚖️ Peso (kg) *", min_value=10.0, max_value=300.0, value=70.0, step=0.5)
-                estatura = st.number_input("📏 Estatura (cm) *", min_value=50.0, max_value=280.0, value=165.0, step=0.5)
+                id_hist = st.text_input(" ID de Historial", value="PAC-001", disabled=True)
+                peso = st.number_input(" Peso (kg) *", min_value=10.0, max_value=300.0, value=70.0, step=0.5)
+                estatura = st.number_input(" Estatura (cm) *", min_value=50.0, max_value=280.0, value=165.0, step=0.5)
             
             st.divider()
             
             col3, col4 = st.columns(2)
             with col3:
                 nivel_actividad = st.select_slider(
-                    "🏃 Nivel de Actividad Física",
+                    " Nivel de Actividad Física",
                     options=["Sedentario", "Ligero", "Moderado", "Activo", "Muy Activo"],
                     value="Moderado"
                 )
-                carbohidratos = st.number_input("🍞 Carbohidratos (g/día)", min_value=0, max_value=600, value=200, step=5,
+                carbohidratos = st.number_input(" Carbohidratos (g/día)", min_value=0, max_value=600, value=200, step=5,
                                                help="Cantidad promedio de carbohidratos consumidos al día")
             with col4:
-                insulina = st.number_input("💉 Dosis Insulina (UI/día)", min_value=0.0, max_value=200.0, value=30.0, step=0.5,
+                insulina = st.number_input(" Dosis Insulina (UI/día)", min_value=0.0, max_value=200.0, value=30.0, step=0.5,
                                           help="Dosis total diaria de insulina")
-                anos_diagnostico = st.number_input("📆 Años desde Diagnóstico DM1", min_value=0, max_value=80, value=5, step=1)
+                anos_diagnostico = st.number_input(" Años desde Diagnóstico DM1", min_value=0, max_value=80, value=5, step=1)
             
             st.divider()
             
-            antecedentes = st.text_area("📋 Historial Clínico", 
+            antecedentes = st.text_area(" Historial Clínico", 
                                        placeholder="Diabetes Tipo 1, alergias, medicamentos, complicaciones...",
                                        help="Información relevante para el contexto clínico")
             
-            st.info("🔬 **El sistema generará:** Un perfil metabólico único basado en sus datos personales, con predicciones personalizadas y gráficas exclusivas para usted.")
+            st.info(" **El sistema generará:** Un perfil metabólico único basado en sus datos personales, con predicciones personalizadas y gráficas exclusivas para usted.")
             
-            enviar = st.form_submit_button("🚀 Generar Mi Gemelo Digital", use_container_width=True)
+            enviar = st.form_submit_button(" Generar Mi Gemelo Digital", use_container_width=True)
             
             if enviar:
                 if not nombre.strip():
-                    st.error("❌ Por favor, ingrese su nombre completo.")
+                    st.error(" Por favor, ingrese su nombre completo.")
                 else:
                     # Guardar datos del paciente
                     st.session_state.paciente_datos = {
@@ -554,19 +554,19 @@ if st.session_state.pagina_actual == "Admisión":
                     }
                     
                     # Generar datos personalizados
-                    with st.spinner("🧬 Generando su perfil metabólico personalizado..."):
+                    with st.spinner(" Generando su perfil metabólico personalizado..."):
                         X, y, columnas_X = generar_datos_paciente(
                             nombre, edad, peso, estatura, nivel_actividad,
                             carbohidratos, insulina, anos_diagnostico
                         )
                         
                         # Entrenar modelos personalizados
-                        with st.spinner("🤖 Entrenando su modelo de IA personalizado..."):
+                        with st.spinner(" Entrenando su modelo de IA personalizado..."):
                             st.session_state.resultados_modelos = entrenar_modelos_personalizados(X, y, columnas_X)
                     
-                    st.success(f"✅ ¡Gemelo Digital de {nombre} generado exitosamente!")
+                    st.success(f" ¡Gemelo Digital de {nombre} generado exitosamente!")
                     st.balloons()
-                    st.info("👉 Dirígete al 'Monitor en Tiempo Real' para ver tus predicciones personalizadas.")
+                    st.info(" Dirígete al 'Monitor en Tiempo Real' para ver tus predicciones personalizadas.")
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
@@ -574,7 +574,7 @@ if st.session_state.pagina_actual == "Admisión":
 # ==============================================================================
 elif st.session_state.pagina_actual == "Gemelo":
     if st.session_state.resultados_modelos is None:
-        st.warning("⚠️ Primero debes generar tu Gemelo Digital en la pestaña 'Admisión'.")
+        st.warning(" Primero debes generar tu Gemelo Digital en la pestaña 'Admisión'.")
         st.stop()
     
     paciente = st.session_state.paciente_datos
@@ -592,7 +592,7 @@ elif st.session_state.pagina_actual == "Gemelo":
     st.markdown("---")
     
     # Perfil metabólico del paciente
-    with st.expander("📋 Mi Perfil Metabólico"):
+    with st.expander(" Mi Perfil Metabólico"):
         glucosa_basal = 90 + (paciente['peso'] - 70) * 0.3
         factor_act = {"Sedentario": 1.10, "Ligero": 1.05, "Moderado": 1.00, "Activo": 0.93, "Muy Activo": 0.87}.get(paciente['nivel_actividad'], 1.0)
         glucosa_ajustada = glucosa_basal * factor_act
@@ -618,7 +618,7 @@ elif st.session_state.pagina_actual == "Gemelo":
         st.markdown("### Parámetros de Simulación")
         st.caption("Ajusta los parámetros para simular tu glucosa en diferentes momentos")
         
-        hora_sim = st.time_input("🕒 Hora del Día:", value=pd.to_datetime("07:30").time())
+        hora_sim = st.time_input(" Hora del Día:", value=pd.to_datetime("07:30").time())
         
         tipos_comida = {
             'AB': 'Desayuno', 'AD': 'Almuerzo', 'AL': 'Cena',
@@ -626,7 +626,7 @@ elif st.session_state.pagina_actual == "Gemelo":
             'BL': 'Snack Nocturno', 'M': 'Sin Comida'
         }
         comida_seleccionada = st.selectbox(
-            "🍽️ Momento / Comida:",
+            " Momento / Comida:",
             options=list(tipos_comida.keys()),
             format_func=lambda x: tipos_comida[x],
             index=0
@@ -655,7 +655,7 @@ elif st.session_state.pagina_actual == "Gemelo":
         st.markdown("### Mi Resultado Clínico")
         
         if st.session_state.prediccion_actual is None:
-            st.info("ℹ️ Ajusta los parámetros y presiona 'Predecir Mi Glucosa'.")
+            st.info(" Ajusta los parámetros y presiona 'Predecir Mi Glucosa'.")
         else:
             pred = st.session_state.prediccion_actual
             
@@ -675,27 +675,27 @@ elif st.session_state.pagina_actual == "Gemelo":
             if pred['glucosa'] < 70:
                 st.markdown("""
                     <div class='alert-card alert-critical'>
-                        <strong>🚨 Alerta: Hipoglucemia Detectada</strong><br>
+                        <strong> Alerta: Hipoglucemia Detectada</strong><br>
                         Tu glucosa está por debajo de 70 mg/dL. ¡Intervención inmediata requerida!
                     </div>
                 """, unsafe_allow_html=True)
             elif pred['glucosa'] > 140:
                 st.markdown("""
                     <div class='alert-card alert-warning'>
-                        <strong>⚠️ Alerta: Hiperglucemia Detectada</strong><br>
+                        <strong> Alerta: Hiperglucemia Detectada</strong><br>
                         Tu glucosa supera los 140 mg/dL. Monitoreo activo recomendado.
                     </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
                     <div class='alert-card alert-stable'>
-                        <strong>✅ ¡Excelente! Rango Estable</strong><br>
+                        <strong> ¡Excelente! Rango Estable</strong><br>
                         Tu glucosa está en rango seguro (70-140 mg/dL). ¡Sigue así!
                     </div>
                 """, unsafe_allow_html=True)
             
             # Gráfica de trayectoria personalizada
-            st.markdown("<br><strong>📈 Mi Trayectoria Proyectada</strong>", unsafe_allow_html=True)
+            st.markdown("<br><strong> Mi Trayectoria Proyectada</strong>", unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(7, 2.2))
             fig.patch.set_facecolor('#FFFFFF')
             ax.set_facecolor('#F8FAFC')
@@ -724,14 +724,14 @@ elif st.session_state.pagina_actual == "Gemelo":
 # ==============================================================================
 elif st.session_state.pagina_actual == "Analisis":
     if st.session_state.resultados_modelos is None:
-        st.warning("⚠️ Primero debes generar tu Gemelo Digital en la pestaña 'Admisión'.")
+        st.warning(" Primero debes generar tu Gemelo Digital en la pestaña 'Admisión'.")
         st.stop()
     
     paciente = st.session_state.paciente_datos
     resultados = st.session_state.resultados_modelos
     
     st.caption("GEMELOS DIGITALES > ANÁLISIS CLÍNICO")
-    st.markdown(f"<h1 class='main-title'>📊 Mi Análisis Clínico Personalizado</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 class='main-title'> Mi Análisis Clínico Personalizado</h1>", unsafe_allow_html=True)
     st.markdown(f"<p class='main-subtitle'>Validación de tu Gemelo Digital - {paciente['nombre']}</p>", unsafe_allow_html=True)
     st.markdown("---")
     
@@ -748,15 +748,15 @@ elif st.session_state.pagina_actual == "Analisis":
     
     st.divider()
     
-    st.subheader(f"📈 Comparativa de Modelos - {paciente['nombre']}")
+    st.subheader(f" Comparativa de Modelos - {paciente['nombre']}")
     mostrar_grafica_comparativa(resultados, paciente['nombre'])
     
     st.divider()
     
-    st.subheader("🔬 Mi Validación Clínica - Rejilla de Clarke")
+    st.subheader(" Mi Validación Clínica - Rejilla de Clarke")
     mostrar_rejilla_clarke(resultados)
     
-    with st.expander("📊 Mi Perfil Metabólico Detallado"):
+    with st.expander(" Mi Perfil Metabólico Detallado"):
         # Calcular parámetros personalizados
         glucosa_basal = 90 + (paciente['peso'] - 70) * 0.3
         factor_act = {"Sedentario": 1.10, "Ligero": 1.05, "Moderado": 1.00, "Activo": 0.93, "Muy Activo": 0.87}.get(paciente['nivel_actividad'], 1.0)
@@ -772,7 +772,7 @@ elif st.session_state.pagina_actual == "Analisis":
         |-----------|----------|----------------|
         | **Edad** | {paciente['edad']} años | {'Metabolismo estable' if paciente['edad'] < 50 else 'Metabolismo más lento'} |
         | **Peso** | {paciente['peso']} kg | {'Normal' if 60 < paciente['peso'] < 80 else 'Fuera de rango'} |
-        | **Actividad Física** | {paciente['nivel_actividad']} | {'👍 Buen nivel' if paciente['nivel_actividad'] in ['Moderado', 'Activo'] else '💪 Considera aumentar actividad'} |
+        | **Actividad Física** | {paciente['nivel_actividad']} | {' Buen nivel' if paciente['nivel_actividad'] in ['Moderado', 'Activo'] else ' Considera aumentar actividad'} |
         | **Carbohidratos** | {paciente['carbohidratos']} g/día | {'Adecuado' if 150 < paciente['carbohidratos'] < 250 else 'Revisar ingesta'} |
         | **Insulina** | {paciente['insulina']} UI/día | {'Adecuado' if 25 < paciente['insulina'] < 50 else 'Revisar dosis'} |
         | **Años DM1** | {paciente['anos_diagnostico']} años | {'Buen control' if paciente['anos_diagnostico'] < 15 else 'Monitoreo intensivo'} |
@@ -792,27 +792,27 @@ elif st.session_state.pagina_actual == "Analisis":
 # ==============================================================================
 elif st.session_state.pagina_actual == "Ayuda":
     st.caption("GEMELOS DIGITALES > DOCUMENTACIÓN")
-    st.markdown("<h1 class='main-title'>ℹ️ Documentación</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-title'> Documentación</h1>", unsafe_allow_html=True)
     st.markdown("---")
     
-    tab1, tab2, tab3 = st.tabs(["📖 ¿Cómo funciona?", "🔬 Personalización", "📚 Referencias"])
+    tab1, tab2, tab3 = st.tabs([" ¿Cómo funciona?", "🔬 Personalización", "📚 Referencias"])
     
     with tab1:
         st.markdown("<div class='clinical-container'>", unsafe_allow_html=True)
         st.markdown("""
-        ### 🎯 ¿Qué es un Gemelo Digital?
+        ###  ¿Qué es un Gemelo Digital?
         
         Es una **réplica virtual de tu metabolismo** que aprende cómo responde tu cuerpo 
         a diferentes situaciones (comidas, horarios, actividad física).
         
-        ### 🧠 ¿Cómo funciona para ti?
+        ###  ¿Cómo funciona para ti?
         
         1. **Ingresas tus datos:** Edad, peso, actividad, dieta, insulina
         2. **Creamos tu perfil:** Generamos un patrón metabólico único
         3. **Entrenamos tu IA:** Modelos personalizados para ti
         4. **Predicciones personalizadas:** Resultados exclusivos para ti
         
-        ### 🎯 ¿Por qué es personalizado?
+        ###  ¿Por qué es personalizado?
         
         Cada persona es diferente. Tu peso, edad, actividad y años con diabetes 
         afectan cómo responde tu cuerpo. Nuestro sistema se adapta a **ti**.
@@ -834,7 +834,7 @@ elif st.session_state.pagina_actual == "Ayuda":
         | **Insulina** | Influye en tu control metabólico |
         | **Años DM1** | Afecta tu variabilidad glucémica |
         
-        ### ✅ Tu Validación Clínica
+        ###  Tu Validación Clínica
         
         La Rejilla de Clarke confirma que **tus predicciones son 100% seguras**.
         """)
@@ -843,13 +843,13 @@ elif st.session_state.pagina_actual == "Ayuda":
     with tab3:
         st.markdown("<div class='clinical-container'>", unsafe_allow_html=True)
         st.markdown("""
-        ### 📚 Referencias Científicas
+        ###  Referencias Científicas
         
         - Cappon, G. (2023). *Journal of Diabetes Science and Technology*, 17(2), 40-52.
         - Hidalgo, J. (2017). *Revista Iberoamericana de IA Médica*, 9(1), 10-22.
         - Sebastião, R., & Matias, A. (2025). *Diabetes Care Automation*, 28(3), 105-118.
         
-        ### 🏆 Programa Delfín
+        ###  Programa Delfín
         
         Estancia de Investigación Internacional - 2026
         """)
@@ -859,4 +859,4 @@ elif st.session_state.pagina_actual == "Ayuda":
 # PIE DE PÁGINA
 # ==============================================================================
 st.divider()
-st.caption("🧬 Gemelos Digitales v2.4.0 | Sistema 100% Personalizado | © Programa Delfín 2026")
+st.caption(" Gemelos Digitales v2.4.0 | Sistema 100% Personalizado | © Programa Delfín 2026")
